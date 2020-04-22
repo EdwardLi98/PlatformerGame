@@ -9,7 +9,7 @@ class player(object):
         self.height = height
         self.vel = 10
         self.isJump = False
-        self.jumpInterval = -8
+        self.jumpInterval = -10
 
     def moveLeft(self):
         self.x -= self.vel
@@ -54,30 +54,40 @@ class player(object):
         self.jumpInterval = value
 
 
+# def drawGameState():
+
 pygame.init()
+
 win_sizex = 1000
 win_sizey = 500
-
 win = pygame.display.set_mode((win_sizex, win_sizey))
+
 pygame.display.set_caption("Test")
+clock = pygame.time.Clock()
 
-player = player(win_sizex / 2, win_sizey - 30, 30, 30)
+bg = pygame.image.load("mountains.png").convert()
+bg_x = 0
+bg_y = -50
 
+player = player(win_sizex / 4, win_sizey - 80, 30, 30)
+
+# Main Loop
 run = True
 while run:
-    pygame.time.delay(30)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
 
     keys = pygame.key.get_pressed()
-
     if keys[pygame.K_LEFT]:
         if player.getX() >= player.getVel():
             player.moveLeft()
+            bg_x += 5
     if keys[pygame.K_RIGHT]:
         if player.getX() <= win_sizex - player.getWidth() - player.getVel():
-            player.moveRight()
+            if player.getX() <= win_sizex / 2 - player.getVel():
+                player.moveRight()
+            bg_x -= 5
     if keys[pygame.K_SPACE]:
         if player.getIsJump() == False:
             player.jump()
@@ -85,24 +95,27 @@ while run:
     if player.getIsJump() == True:
         y = player.getY()
         jumpInterval = player.getJumpInterval()
-        neg = -1
-        if jumpInterval <= 8:
-            if jumpInterval > 0:
-                neg = 1
-            y = y + (jumpInterval) ** 2 * neg
+        if jumpInterval <= 10:
+            y = y + (jumpInterval) * abs(jumpInterval) * 0.5
             player.setY(y)
             jumpInterval += 1
             player.setJumpInterval(jumpInterval)
         else:
             player.setIsJump(False)
-            player.setJumpInterval(-8)
+            player.setJumpInterval(-10)
 
-    win.fill((0))
+    # Background transition
+    rel_bg_x = bg_x % bg.get_rect().width
+    win.blit(bg, (rel_bg_x - bg.get_rect().width, bg_y))
+    if rel_bg_x < bg.get_rect().width:
+        win.blit(bg, (rel_bg_x, bg_y))
+
     pygame.draw.rect(
         win,
-        (0, 255, 0),
+        (102, 0, 204),
         (player.getX(), player.getY(), player.getWidth(), player.getHeight()),
     )
     pygame.display.update()
+    clock.tick(60)
 
 pygame.quit()
