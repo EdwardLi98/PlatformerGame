@@ -1,60 +1,6 @@
 import pygame
-
-
-class player(object):
-    def __init__(self, x, y, width, height):
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.vel = 10
-        self.isJump = False
-        self.jumpInterval = -10
-
-    def moveLeft(self):
-        self.x -= self.vel
-
-    def moveRight(self):
-        self.x += self.vel
-
-    def jump(self):
-        self.isJump = True
-
-    def getX(self):
-        return self.x
-
-    def getY(self):
-        return self.y
-
-    def setX(self, value):
-        self.x = value
-
-    def setY(self, value):
-        self.y = value
-
-    def getVel(self):
-        return self.vel
-
-    def getWidth(self):
-        return self.width
-
-    def getHeight(self):
-        return self.height
-
-    def getIsJump(self):
-        return self.isJump
-
-    def getJumpInterval(self):
-        return self.jumpInterval
-
-    def setIsJump(self, value):
-        self.isJump = value
-
-    def setJumpInterval(self, value):
-        self.jumpInterval = value
-
-
-# def drawGameState():
+import os
+from player import player
 
 pygame.init()
 
@@ -68,8 +14,59 @@ clock = pygame.time.Clock()
 bg = pygame.image.load("mountains.png").convert()
 bg_x = 0
 bg_y = -50
+runRight = [
+    pygame.image.load(os.path.join("HeroKnight\Run\HeroKnight_Run_" + str(x) + ".png"))
+    for x in range(0, 10)
+]
 
-player = player(win_sizex / 4, win_sizey - 80, 30, 30)
+idle = [
+    pygame.image.load(
+        os.path.join("HeroKnight\Idle\HeroKnight_Idle_" + str(x) + ".png")
+    )
+    for x in range(0, 8)
+]
+
+player = player(win_sizex / 2 - 100, win_sizey - 100, 30, 30)
+
+
+def drawGameStatus():
+    global bg_x, bg, bg_y, player
+
+    rel_bg_x = bg_x % bg.get_rect().width
+    win.blit(bg, (rel_bg_x - bg.get_rect().width, bg_y))
+    if rel_bg_x < bg.get_rect().width:
+        win.blit(bg, (rel_bg_x, bg_y))
+
+    if player.getIsRunning():
+        if player.getWalkCount() + 1 >= 30:
+            player.setWalkCount(0)
+
+        if player.getFaceRight():
+            win.blit(
+                runRight[player.getWalkCount() // 3], (player.getX(), player.getY())
+            )
+            player.setIdleCount(0)
+        elif player.getFaceLeft():
+            win.blit(
+                pygame.transform.flip(
+                    runRight[player.getWalkCount() // 3], True, False
+                ),
+                (player.getX(), player.getY()),
+            )
+            player.setIdleCount(0)
+    elif player.getIsIdle():
+        if player.getIdleCount() + 1 >= 22:
+            player.setIdleCount(0)
+        if player.getFaceLeft():
+            win.blit(
+                pygame.transform.flip(idle[player.getIdleCount() // 3], True, False),
+                (player.getX(), player.getY()),
+            )
+        elif player.getFaceRight():
+            win.blit(idle[player.getIdleCount() // 3], (player.getX(), player.getY()))
+
+    pygame.display.update()
+
 
 # Main Loop
 run = True
@@ -79,15 +76,27 @@ while run:
             run = False
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT]:
+    if keys[pygame.K_a]:
         if player.getX() >= player.getVel():
-            player.moveLeft()
+            player.setFaceLeft(True)
+            player.setFaceRight(False)
+            player.setIsRunning(True)
+            player.setIsIdle(False)
+            player.setWalkCount(player.getWalkCount() + 1)
             bg_x += 5
-    if keys[pygame.K_RIGHT]:
+    elif keys[pygame.K_d]:
         if player.getX() <= win_sizex - player.getWidth() - player.getVel():
-            if player.getX() <= win_sizex / 2 - player.getVel():
-                player.moveRight()
+            player.setFaceLeft(False)
+            player.setFaceRight(True)
+            player.setIsRunning(True)
+            player.setIsIdle(False)
+            player.setWalkCount(player.getWalkCount() + 1)
             bg_x -= 5
+    else:
+        player.setIsRunning(False)
+        player.setIsIdle(True)
+        player.setIdleCount(player.getIdleCount() + 1)
+
     if keys[pygame.K_SPACE]:
         if player.getIsJump() == False:
             player.jump()
@@ -105,17 +114,7 @@ while run:
             player.setJumpInterval(-10)
 
     # Background transition
-    rel_bg_x = bg_x % bg.get_rect().width
-    win.blit(bg, (rel_bg_x - bg.get_rect().width, bg_y))
-    if rel_bg_x < bg.get_rect().width:
-        win.blit(bg, (rel_bg_x, bg_y))
-
-    pygame.draw.rect(
-        win,
-        (102, 0, 204),
-        (player.getX(), player.getY(), player.getWidth(), player.getHeight()),
-    )
-    pygame.display.update()
+    drawGameStatus()
     clock.tick(60)
 
 pygame.quit()
