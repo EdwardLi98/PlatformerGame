@@ -1,3 +1,6 @@
+import pygame
+
+
 class Player(object):
     def __init__(self, x, y, width, height):
         self.x = x
@@ -13,6 +16,9 @@ class Player(object):
         self.idleCount = 0
         self.isIdle = True
         self.isRunning = False
+        self.rect = pygame.Rect(
+            self.x + 30, self.y + 10, self.width - 65, self.height - 10
+        )
 
     def moveLeft(self):
         self.x -= self.vel
@@ -31,9 +37,11 @@ class Player(object):
 
     def setX(self, value):
         self.x = value
+        self.updateRect()
 
     def setY(self, value):
         self.y = value
+        self.updateRect()
 
     def getVel(self):
         return self.vel
@@ -91,3 +99,10 @@ class Player(object):
 
     def setIsRunning(self, value):
         self.isRunning = value
+
+    def updateRect(self):
+        self.rect.x = self.x + 30
+        self.rect.y = self.y + 10
+
+    def getRect(self):
+        return self.rect

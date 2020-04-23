@@ -47,7 +47,7 @@ class System(object):
         ]
         self.idle = idle
 
-        player = Player(self.win_x / 2 - 100, self.win_y - 100, 30, 30)
+        player = Player(self.win_x / 2 - 100, self.win_y - 100, 100, 55)
         self.player = player
 
     def drawGameStatus(self):
@@ -64,6 +64,8 @@ class System(object):
         display.blit(bg, (rel_bg_x - bg.get_rect().width, bg_y))
         if rel_bg_x < bg.get_rect().width:
             display.blit(bg, (rel_bg_x, bg_y))
+
+        pygame.draw.rect(self.display, (0, 255, 0), player.getRect(), 1)
 
         if player.getIsRunning():
             if player.getWalkCount() + 1 >= 30:
@@ -94,59 +96,62 @@ class System(object):
                 display.blit(
                     idle[player.getIdleCount() // 3], (player.getX(), player.getY())
                 )
-
         pygame.display.update()
 
     def runGame(self):
+        player = self.player
         clock = pygame.time.Clock()
         run = True
         while run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
-
-            player = self.player
-
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_a]:
-                if player.getX() >= player.getVel():
-                    player.setFaceLeft(True)
-                    player.setFaceRight(False)
-                    player.setIsRunning(True)
-                    player.setIsIdle(False)
-                    player.setWalkCount(player.getWalkCount() + 1)
-                    self.bg_x += 5
-            elif keys[pygame.K_d]:
-                if player.getX() <= self.win_x - player.getWidth() - player.getVel():
-                    player.setFaceLeft(False)
-                    player.setFaceRight(True)
-                    player.setIsRunning(True)
-                    player.setIsIdle(False)
-                    player.setWalkCount(player.getWalkCount() + 1)
-                    self.bg_x -= 5
-            else:
-                player.setIsRunning(False)
-                player.setIsIdle(True)
-                player.setIdleCount(player.getIdleCount() + 1)
-
-            if keys[pygame.K_SPACE]:
-                if player.getIsJump() == False:
-                    player.jump()
-
-            if player.getIsJump() == True:
-                y = player.getY()
-                jumpInterval = player.getJumpInterval()
-                if jumpInterval <= 10:
-                    y = y + (jumpInterval) * abs(jumpInterval) * 0.5
-                    player.setY(y)
-                    jumpInterval += 1
-                    player.setJumpInterval(jumpInterval)
-                else:
-                    player.setIsJump(False)
-                    player.setJumpInterval(-10)
-
-            self.player = player
+            self.keyPress()
             self.drawGameStatus()
             clock.tick(60)
 
         pygame.quit()
+
+    def keyPress(self):
+        player = self.player
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_a]:
+            if player.getX() >= player.getVel():
+                player.setFaceLeft(True)
+                player.setFaceRight(False)
+                player.setIsRunning(True)
+                player.setIsIdle(False)
+                player.setWalkCount(player.getWalkCount() + 1)
+                # self.bg_x += 5
+                player.setX(player.getX() - player.getVel())
+        elif keys[pygame.K_d]:
+            if player.getX() <= self.win_x - player.getWidth() - player.getVel():
+                player.setFaceLeft(False)
+                player.setFaceRight(True)
+                player.setIsRunning(True)
+                player.setIsIdle(False)
+                player.setWalkCount(player.getWalkCount() + 1)
+                # self.bg_x -= 5
+                player.setX(player.getX() + player.getVel())
+        else:
+            player.setIsRunning(False)
+            player.setIsIdle(True)
+            player.setIdleCount(player.getIdleCount() + 1)
+
+        if keys[pygame.K_SPACE]:
+            if player.getIsJump() == False:
+                player.jump()
+
+        if player.getIsJump() == True:
+            y = player.getY()
+            jumpInterval = player.getJumpInterval()
+            if jumpInterval <= 10:
+                y = y + (jumpInterval) * abs(jumpInterval) * 0.5
+                player.setY(y)
+                jumpInterval += 1
+                player.setJumpInterval(jumpInterval)
+            else:
+                player.setIsJump(False)
+                player.setJumpInterval(-10)
+
+        self.player = player
