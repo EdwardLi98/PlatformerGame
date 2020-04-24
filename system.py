@@ -241,7 +241,6 @@ class System(object):
         for tile in tile_rect:
             if player_rect.colliderect(tile):
                 #Case 1: Tile is underneath
-                if tile.center
                 if player_rect.bottom >= tile.top and player_rect.bottom <= tile.bottom:
                     player.setIsJump(False)
                     if not keys[pygame.K_SPACE]:
@@ -249,9 +248,9 @@ class System(object):
                         collision_direction['bottom'] = True
                         player.setVelY(0)
                 #Case 2: Tile is to the right
-                if tile.centerx > player_rect.centerx:
-                    if player_rect.right >= tile.left and player_rect.right <= tile.right:
-                        collision_direction['right'] = True
-                        player.setX(tile.left - player.getWidth() + 1)
+                #if tile.centerx > player_rect.centerx:
+                    #if player_rect.right >= tile.left and player_rect.right <= tile.right:
+                        #collision_direction['right'] = True
+                        #player.setX(tile.left - player.getWidth() + 1)
 
         return collision_direction
