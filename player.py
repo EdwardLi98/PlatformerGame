@@ -7,7 +7,8 @@ class Player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.vel = 10
+        self.velX = 2 
+        self.velY = 0 
         self.isJump = False
         self.jumpInterval = -10
         self.faceLeft = False
@@ -26,9 +27,6 @@ class Player(object):
     def moveRight(self):
         self.x += self.vel
 
-    def jump(self):
-        self.isJump = True
-
     def getX(self):
         return self.x
 
@@ -43,8 +41,14 @@ class Player(object):
         self.y = value
         self.updateRect()
 
-    def getVel(self):
-        return self.vel
+    def getVelX(self):
+        return self.velX
+    
+    def getVelY(self):
+        return self.velY
+    
+    def setVelY(self, value):
+        self.velY = value
 
     def getWidth(self):
         return self.width

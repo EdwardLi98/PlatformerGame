@@ -6,7 +6,7 @@ from system import System
 
 def main():
     # Initialise window
-    system = System(1000, 500, 0, -50)
+    system = System(1092, 615, 0, 0)
     system.initialiseGame()
     system.runGame()
 
