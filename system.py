@@ -10,13 +10,13 @@ game_map = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -59,6 +59,7 @@ class System(object):
             )
             for x in range(0, 10)
         ]
+
         self.run = run
 
         idle = [
@@ -126,35 +127,37 @@ class System(object):
             a += 1
         self.tile_rect = tile_rect
 
+        #Increasing value of delay slows down player animation
+        delay = 5
         if player.getIsRunning():
-            if player.getWalkCount() + 1 >= 30:
+            if player.getWalkCount() + 1 >= delay*10:
                 player.setWalkCount(0)
 
             if player.getFaceRight():
                 display.blit(
-                    run[player.getWalkCount() // 3],
+                    run[player.getWalkCount() // delay],
                     (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
                 )
                 player.setIdleCount(0)
             elif player.getFaceLeft():
                 display.blit(
-                    pygame.transform.flip(run[player.getWalkCount() // 3], True, False),
+                    pygame.transform.flip(run[player.getWalkCount() // delay], True, False),
                     (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
                 )
                 player.setIdleCount(0)
         elif player.getIsIdle():
-            if player.getIdleCount() + 1 >= 22:
+            if player.getIdleCount() + 1 >= delay*7:
                 player.setIdleCount(0)
             if player.getFaceLeft():
                 display.blit(
                     pygame.transform.flip(
-                        idle[player.getIdleCount() // 3], True, False
+                        idle[player.getIdleCount() // delay], True, False
                     ),
                     (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
                 )
             elif player.getFaceRight():
                 display.blit(
-                    idle[player.getIdleCount() // 3],
+                    idle[player.getIdleCount() // 5],
                     (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
                 )
         pygame.display.update()
@@ -170,87 +173,92 @@ class System(object):
 
             self.movement()
             self.drawGameStatus()
-            clock.tick(100)
+            clock.tick(60)
 
         pygame.quit()
 
     def movement(self):
 
-        player = self.player
         keys = pygame.key.get_pressed()
-        collision_direction = self.detectPlayerCollision(player, keys)
 
         #Deal with keyboard presses
         if keys[pygame.K_a]:
-            if player.getX() >= player.getVelX():
-                player.setFaceLeft(True)
-                player.setFaceRight(False)
-                player.setIsRunning(True)
-                player.setIsIdle(False)
-                player.setWalkCount(player.getWalkCount() + 1)
-                # self.bg_x += 5
-                player.setX(player.getX() - player.getVelX())
+            self.player.setFaceLeft()
+            self.player.setIsRunning()
+            self.player.setWalkCount(self.player.getWalkCount() + 1)
+            self.player.setVelX(-3)
         elif keys[pygame.K_d]:
-            if player.getX() <= self.win_x - player.getWidth() - player.getVelX() and not collision_direction['right']:
-                player.setFaceLeft(False)
-                player.setFaceRight(True)
-                player.setIsRunning(True)
-                player.setIsIdle(False)
-                player.setWalkCount(player.getWalkCount() + 1)
-                # self.bg_x -= 5
-                player.setX(player.getX() + player.getVelX())
+            self.player.setFaceRight()
+            self.player.setIsRunning()
+            self.player.setWalkCount(self.player.getWalkCount() + 1)
+            self.player.setVelX(3)
         else:
-            player.setIsRunning(False)
-            player.setIsIdle(True)
-            player.setIdleCount(player.getIdleCount() + 1)
+            self.player.setIsIdle()
+            self.player.setIdleCount(self.player.getIdleCount() + 1)
+            self.player.setVelX(0)
 
         if keys[pygame.K_SPACE]:
-            if player.getIsJump() == False:
-                player.setIsJump(True)
-                print("This runs")
-                player.setVelY(-15)
+            if self.player.getIsJump() == False:
+                self.player.setIsJump(True)
+                self.player.setVelY(-15)
 
-        if player.getIsJump() == True and collision_direction['bottom']:
-            player.setIsJump(False)
-            #y = player.getY()
-            #jumpInterval = player.getJumpInterval()
-            #if jumpInterval <= 10 and not collision_direction['bottom']:
-                #y = y + (jumpInterval) * abs(jumpInterval) * 0.5
-                #player.setY(y)
-                #jumpInterval += 1
-                #player.setJumpInterval(jumpInterval)
-            #else:
-                #player.setIsJump(False)
-                #player.setJumpInterval(-10)
+        #Player movement left and right
+        if self.player.getVelX() < 0:
+            collision_direction = self.detectPlayerCollision('left')
+        elif self.player.getVelX() > 0:
+            collision_direction = self.detectPlayerCollision('right')
 
-        #Player gravity
-        if player.getY() + player.getHeight() + player.getVelY() <= self.win_y and not collision_direction['bottom']:
-            player.setY(player.getY() + player.getVelY())
-        if player.getVelY() < 10:
-            player.setVelY(player.getVelY() + 1)
+        if self.player.getVelX() != 0 and collision_direction['left'] == False and collision_direction['right'] == False:
+            self.player.setX(self.player.getX() + self.player.getVelX())
 
 
-        self.player = player
+        #Player movement up and down
+        if self.player.getVelY() < 0:
+            collision_direction = self.detectPlayerCollision('up')
+        elif self.player.getVelY() > 0:
+            collision_direction = self.detectPlayerCollision('down') 
 
-    def detectPlayerCollision(self, player, keys):
-        collision_direction = {'top': False, 'bottom': False, 'left': False, 'right': False}
-        player_rect = player.getRect()
-        tile_rect = self.tile_rect
+        if self.player.getVelY() == 0:
+            self.player.setVelY(1)
+        elif collision_direction['down'] == False:
+            #Gravity which adds 1 to downward velocity every tick
+            self.player.setVelY(self.player.getVelY() + 1)
+            if collision_direction['up'] == False:
+                self.player.setY(self.player.getY() + self.player.getVelY())
+        else:
+            self.player.setIsJump(False)
 
-        #Test which side of player is colliding with tile
-        for tile in tile_rect:
-            if player_rect.colliderect(tile):
-                #Case 1: Tile is underneath
-                if player_rect.bottom >= tile.top and player_rect.bottom <= tile.bottom:
-                    player.setIsJump(False)
-                    if not keys[pygame.K_SPACE]:
-                        player.setY(tile.top - player.getHeight() + 1)
-                        collision_direction['bottom'] = True
-                        player.setVelY(0)
-                #Case 2: Tile is to the right
-                #if tile.centerx > player_rect.centerx:
-                    #if player_rect.right >= tile.left and player_rect.right <= tile.right:
-                        #collision_direction['right'] = True
-                        #player.setX(tile.left - player.getWidth() + 1)
 
+    def detectPlayerCollision(self, direction):
+        collision_direction = {'up': False, 'down': False, 'left': False, 'right': False}
+
+        rel_rect = self.player.getRect()
+        #Collision check for vertical momentum
+        if direction == 'down' or direction == 'up':
+            rel_rect = rel_rect.move(0, self.player.getVelY())
+            if direction == 'down':
+                for tile in self.tile_rect:
+                    if rel_rect.colliderect(tile):
+                        self.player.setY(tile.top - self.player.getRect().height - 10)
+                        collision_direction['down'] = True
+            elif direction == 'up':
+                for tile in self.tile_rect:
+                    if rel_rect.colliderect(tile):
+                        self.player.setY(tile.bottom - 10)
+                        collision_direction['up'] = True
+
+        #Collision check for horizontal momentum
+        if direction == 'left' or direction == 'right':
+            rel_rect = rel_rect.move(self.player.getVelX(), 0)
+            if direction == 'left':
+                for tile in self.tile_rect:
+                    if rel_rect.colliderect(tile):
+                        self.player.setX(tile.right - 35)
+                        collision_direction['left'] = True
+            elif direction == 'right':
+                for tile in self.tile_rect:
+                    if rel_rect.colliderect(tile):
+                        self.player.setX(tile.left - self.player.getRect().width - 35)
+                        collision_direction['right'] = True
+            
         return collision_direction

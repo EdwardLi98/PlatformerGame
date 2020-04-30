@@ -7,7 +7,7 @@ class Player(object):
         self.y = y
         self.width = width
         self.height = height
-        self.velX = 2 
+        self.velX = 0 
         self.velY = 0 
         self.isJump = False
         self.jumpInterval = -10
@@ -18,7 +18,7 @@ class Player(object):
         self.isIdle = True
         self.isRunning = False
         self.rect = pygame.Rect(
-            self.x + 30, self.y + 10, self.width - 65, self.height - 10
+            self.x + 35, self.y + 10, 30, 45 
         )
 
     def moveLeft(self):
@@ -47,6 +47,9 @@ class Player(object):
     def getVelY(self):
         return self.velY
     
+    def setVelX(self, value):
+        self.velX = value
+    
     def setVelY(self, value):
         self.velY = value
 
@@ -71,14 +74,16 @@ class Player(object):
     def getFaceLeft(self):
         return self.faceLeft
 
-    def setFaceLeft(self, value):
-        self.faceLeft = value
+    def setFaceLeft(self):
+        self.faceLeft = True 
+        self.faceRight = False
 
     def getFaceRight(self):
         return self.faceRight
 
-    def setFaceRight(self, value):
-        self.faceRight = value
+    def setFaceRight(self):
+        self.faceRight = True 
+        self.faceLeft = False
 
     def getWalkCount(self):
         return self.walkCount
@@ -95,17 +100,19 @@ class Player(object):
     def getIsIdle(self):
         return self.isIdle
 
-    def setIsIdle(self, value):
-        self.isIdle = value
+    def setIsIdle(self):
+        self.isIdle = True 
+        self.isRunning = False
 
     def getIsRunning(self):
         return self.isRunning
 
-    def setIsRunning(self, value):
-        self.isRunning = value
+    def setIsRunning(self):
+        self.isRunning = True 
+        self.isIdle = False
 
     def updateRect(self):
-        self.rect.x = self.x + 30
+        self.rect.x = self.x + 35
         self.rect.y = self.y + 10
 
     def getRect(self):
