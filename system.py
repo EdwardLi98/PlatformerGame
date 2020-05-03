@@ -1,10 +1,11 @@
 import pygame
 import os
 from player import Player
+from map import Map
 
 game_map = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -27,9 +28,6 @@ class System(object):
     def __init__(self, win_x, win_y, bg_x, bg_y):
         self.win_x = win_x
         self.win_y = win_y
-        self.bg_x = bg_x
-        self.bg_y = bg_y
-        self.bg = False
         self.display = False
         self.run = False
         self.idle = False
@@ -49,8 +47,6 @@ class System(object):
         surface.fill((250, 250, 250))
 
         clock = pygame.time.Clock()
-        bg = pygame.image.load("mountains.png").convert()
-        self.bg = bg
 
         # Load in all the images and sprites
         run = [
@@ -70,15 +66,16 @@ class System(object):
         ]
         self.idle = idle
 
-        player = Player(self.win_x // 2 - 50, self.win_y - 250, 100, 55)
+        player = Player(0, 0, 100, 55)
         self.player = player
+
+        self.map = Map(os.path.join("Maps\Map1.tmx"))
+        self.map_img = self.map.make_map()
+        self.map_rect = self.map_img.get_rect()
 
     def drawGameStatus(self):
 
-        bg = self.bg
         player = self.player
-        bg_x = self.bg_x
-        bg_y = self.bg_y
         display = self.display
         run = self.run
         idle = self.idle
@@ -104,13 +101,12 @@ class System(object):
         )
 
         display.fill((0, 0, 0))
-        display.blit(bg, (-self.scroll[0], -self.scroll[1]))
-
+        display.blit(self.map_img, (0 - self.scroll[0],0 - self.scroll[1]))
 
         #Code to draw hitbox around player (not true hit box)
-        hitbox = player.getRect()
-        shifted_hitbox = pygame.Rect(hitbox.x - self.scroll[0], hitbox.y - self.scroll[1], hitbox.width, hitbox.height) 
-        pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
+        #hitbox = player.getRect()
+        #shifted_hitbox = pygame.Rect(hitbox.x - self.scroll[0], hitbox.y - self.scroll[1], hitbox.width, hitbox.height) 
+        #pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
 
         #tile_rect is a list of all tile rects/ Renders all tiles onto display
         tile_rect = []
