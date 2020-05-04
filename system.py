@@ -2,27 +2,7 @@ import pygame
 import os
 from player import Player
 from map import Map
-
-game_map = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+from camera import Camera
 
 class System(object):
     def __init__(self, win_x, win_y, bg_x, bg_y):
@@ -32,8 +12,7 @@ class System(object):
         self.run = False
         self.idle = False
         self.player = False
-        self.scroll = [0, 0]
-        self.tile_rect = []
+        self.obstacle_rect = []
 
     def initialiseGame(self):
         pygame.init()
@@ -66,12 +45,19 @@ class System(object):
         ]
         self.idle = idle
 
-        player = Player(0, 0, 100, 55)
-        self.player = player
-
         self.map = Map(os.path.join("Maps\Map1.tmx"))
         self.map_img = self.map.make_map()
         self.map_rect = self.map_img.get_rect()
+        
+        for tile_object in self.map.tmxdata.objects:
+            if tile_object.name == "Player":
+                self.player = Player(tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+            elif tile_object.name == "Ground":
+                rect = pygame.Rect(tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+                self.obstacle_rect.append(rect)
+                
+
+        self.camera = Camera(self.player, 0, 0, self.win_x, self.win_y)
 
     def drawGameStatus(self):
 
@@ -80,48 +66,15 @@ class System(object):
         run = self.run
         idle = self.idle
 
-        # rel_bg_x = bg_x % bg.get_rect().width
-        # display.blit(bg, (rel_bg_x - bg.get_rect().width, bg_y))
-        # if rel_bg_x < bg.get_rect().width:
-        # display.blit(bg, (rel_bg_x, bg_y))
-        # self.scroll is the amount the player has moved (left is negative, right is positive)
-        self.scroll[0] += int(
-            (player.getX() - self.scroll[0] - self.win_x // 2 + player.getWidth() // 2)
-            / 30
-        )
-        self.scroll[1] += int(
-            (
-                player.getY()
-                - self.scroll[1]
-                - self.win_y
-                + 200
-                + player.getHeight() // 2
-            )
-            / 30
-        )
+        self.camera.updateCamera(self.player)
 
         display.fill((0, 0, 0))
-        display.blit(self.map_img, (0 - self.scroll[0],0 - self.scroll[1]))
+        display.blit(self.map_img, self.camera.applyCameraBlock(0, 0))
 
         #Code to draw hitbox around player (not true hit box)
-        #hitbox = player.getRect()
-        #shifted_hitbox = pygame.Rect(hitbox.x - self.scroll[0], hitbox.y - self.scroll[1], hitbox.width, hitbox.height) 
-        #pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
-
-        #tile_rect is a list of all tile rects/ Renders all tiles onto display
-        tile_rect = []
-        a = 0
-        for layer in game_map:
-            b = 0
-            for tile in layer:
-                rect = pygame.Rect(b*32 - self.scroll[0], a*32 - self.scroll[1], 32, 32)
-                if tile != 0:
-                    tile_rect.append(pygame.Rect(b*32, a*32, 32, 32))
-                if tile == 1:
-                    pygame.draw.rect(self.display, (255, 255, 255), rect)
-                b += 1
-            a += 1
-        self.tile_rect = tile_rect
+        hitbox = player.getRect()
+        shifted_hitbox = pygame.Rect(self.camera.applyCameraBlock(hitbox.x, hitbox.y), (hitbox.width, hitbox.height)) 
+        pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
 
         #Increasing value of delay slows down player animation
         delay = 5
@@ -132,13 +85,13 @@ class System(object):
             if player.getFaceRight():
                 display.blit(
                     run[player.getWalkCount() // delay],
-                    (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
+                    self.camera.applyCameraBlock(player.getX(), player.getY()),
                 )
                 player.setIdleCount(0)
             elif player.getFaceLeft():
                 display.blit(
                     pygame.transform.flip(run[player.getWalkCount() // delay], True, False),
-                    (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
+                    self.camera.applyCameraBlock(player.getX(), player.getY()),
                 )
                 player.setIdleCount(0)
         elif player.getIsIdle():
@@ -149,12 +102,12 @@ class System(object):
                     pygame.transform.flip(
                         idle[player.getIdleCount() // delay], True, False
                     ),
-                    (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
+                    self.camera.applyCameraBlock(player.getX(), player.getY()),
                 )
             elif player.getFaceRight():
                 display.blit(
                     idle[player.getIdleCount() // 5],
-                    (player.getX() - self.scroll[0], player.getY() - self.scroll[1]),
+                    self.camera.applyCameraBlock(player.getX(), player.getY()),
                 )
         pygame.display.update()
 
@@ -216,13 +169,12 @@ class System(object):
 
         if self.player.getVelY() == 0:
             self.player.setVelY(1)
-        elif collision_direction['down'] == False:
-            #Gravity which adds 1 to downward velocity every tick
+        elif collision_direction['down'] == False and collision_direction['up'] == False:
+            self.player.setY(self.player.getY() + self.player.getVelY())
             self.player.setVelY(self.player.getVelY() + 1)
-            if collision_direction['up'] == False:
-                self.player.setY(self.player.getY() + self.player.getVelY())
         else:
             self.player.setIsJump(False)
+            self.player.setVelY(1)
 
 
     def detectPlayerCollision(self, direction):
@@ -233,12 +185,12 @@ class System(object):
         if direction == 'down' or direction == 'up':
             rel_rect = rel_rect.move(0, self.player.getVelY())
             if direction == 'down':
-                for tile in self.tile_rect:
+                for tile in self.obstacle_rect:
                     if rel_rect.colliderect(tile):
                         self.player.setY(tile.top - self.player.getRect().height - 10)
                         collision_direction['down'] = True
             elif direction == 'up':
-                for tile in self.tile_rect:
+                for tile in self.obstacle_rect:
                     if rel_rect.colliderect(tile):
                         self.player.setY(tile.bottom - 10)
                         collision_direction['up'] = True
@@ -247,12 +199,12 @@ class System(object):
         if direction == 'left' or direction == 'right':
             rel_rect = rel_rect.move(self.player.getVelX(), 0)
             if direction == 'left':
-                for tile in self.tile_rect:
+                for tile in self.obstacle_rect:
                     if rel_rect.colliderect(tile):
                         self.player.setX(tile.right - 35)
                         collision_direction['left'] = True
             elif direction == 'right':
-                for tile in self.tile_rect:
+                for tile in self.obstacle_rect:
                     if rel_rect.colliderect(tile):
                         self.player.setX(tile.left - self.player.getRect().width - 35)
                         collision_direction['right'] = True

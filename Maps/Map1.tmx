@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="1">
+<map version="1.2" tiledversion="1.3.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="19">
  <tileset firstgid="1" source="cavesofgallet_tiles.tsx"/>
  <layer id="2" name="Background" width="100" height="100">
   <data encoding="csv">
@@ -105,6 +105,23 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="7" name="Obstacles">
+  <object id="1" x="496" y="208"/>
+  <object id="2" name="Ground" x="0" y="544" width="288" height="32"/>
+  <object id="3" name="Player" x="960" y="392" width="100" height="55"/>
+  <object id="5" name="Ground" x="288" y="384" width="32" height="192"/>
+  <object id="6" name="Ground" x="320" y="384" width="192" height="32"/>
+  <object id="7" name="Ground" x="480" y="192" width="32" height="192"/>
+  <object id="8" name="Ground" x="512" y="192" width="224" height="32"/>
+  <object id="9" name="Ground" x="704" y="224" width="32" height="224"/>
+  <object id="10" name="Ground" x="952" y="192" width="104" height="192"/>
+  <object id="11" name="Ground" x="1088" y="192" width="64" height="192"/>
+  <object id="12" name="Ground" x="960" y="448" width="160" height="160"/>
+  <object id="14" name="Ground" x="1120" y="384" width="32" height="224"/>
+  <object id="16" name="Ground" x="160" y="416" width="64" height="4"/>
+  <object id="17" name="Ground" x="256" y="416" width="32" height="4"/>
+  <object id="18" name="Ground" x="1152" y="192" width="160" height="32"/>
+ </objectgroup>
  <layer id="3" name="Platform" width="100" height="100">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
