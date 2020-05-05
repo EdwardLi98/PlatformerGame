@@ -13,6 +13,7 @@ class System(object):
         self.idle = False
         self.player = False
         self.obstacle_rect = []
+        self.interact_rect = []
 
     def initialiseGame(self):
         pygame.init()
@@ -55,9 +56,12 @@ class System(object):
             elif tile_object.name == "Ground":
                 rect = pygame.Rect(tile_object.x, tile_object.y, tile_object.width, tile_object.height)
                 self.obstacle_rect.append(rect)
+            elif tile_object.name == "Ladder":
+                rect = pygame.Rect(tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+                self.interact_rect.append(rect)
                 
 
-        self.camera = Camera(self.player, 0, 0, self.win_x, self.win_y)
+        self.camera = Camera(self.player, self.map, 0, 0, self.win_x, self.win_y)
 
     def drawGameStatus(self):
 
@@ -72,9 +76,9 @@ class System(object):
         display.blit(self.map_img, self.camera.applyCameraBlock(0, 0))
 
         #Code to draw hitbox around player (not true hit box)
-        hitbox = player.getRect()
-        shifted_hitbox = pygame.Rect(self.camera.applyCameraBlock(hitbox.x, hitbox.y), (hitbox.width, hitbox.height)) 
-        pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
+        #hitbox = player.getRect()
+        #shifted_hitbox = pygame.Rect(self.camera.applyCameraBlock(hitbox.x, hitbox.y), (hitbox.width, hitbox.height)) 
+        #pygame.draw.rect(self.display, (0, 255, 0), shifted_hitbox, 1)
 
         #Increasing value of delay slows down player animation
         delay = 5
@@ -141,6 +145,12 @@ class System(object):
             self.player.setIsRunning()
             self.player.setWalkCount(self.player.getWalkCount() + 1)
             self.player.setVelX(3)
+        elif keys[pygame.K_w]:
+            self.player.setIsIdle()
+            self.player.setIdleCount(self.player.getIdleCount() + 1)
+            self.player.setVelX(0)
+            if self.detectPlayerCollisionLadder():
+                self.player.setVelY(-3)
         else:
             self.player.setIsIdle()
             self.player.setIdleCount(self.player.getIdleCount() + 1)
@@ -153,9 +163,9 @@ class System(object):
 
         #Player movement left and right
         if self.player.getVelX() < 0:
-            collision_direction = self.detectPlayerCollision('left')
+            collision_direction = self.detectPlayerCollisionGround('left')
         elif self.player.getVelX() > 0:
-            collision_direction = self.detectPlayerCollision('right')
+            collision_direction = self.detectPlayerCollisionGround('right')
 
         if self.player.getVelX() != 0 and collision_direction['left'] == False and collision_direction['right'] == False:
             self.player.setX(self.player.getX() + self.player.getVelX())
@@ -163,21 +173,23 @@ class System(object):
 
         #Player movement up and down
         if self.player.getVelY() < 0:
-            collision_direction = self.detectPlayerCollision('up')
+            collision_direction = self.detectPlayerCollisionGround('up')
         elif self.player.getVelY() > 0:
-            collision_direction = self.detectPlayerCollision('down') 
+            collision_direction = self.detectPlayerCollisionGround('down') 
 
         if self.player.getVelY() == 0:
             self.player.setVelY(1)
         elif collision_direction['down'] == False and collision_direction['up'] == False:
             self.player.setY(self.player.getY() + self.player.getVelY())
             self.player.setVelY(self.player.getVelY() + 1)
-        else:
-            self.player.setIsJump(False)
+        elif collision_direction['up']:
             self.player.setVelY(1)
+        else:
+            self.player.setVelY(1)
+            self.player.setIsJump(False)
 
 
-    def detectPlayerCollision(self, direction):
+    def detectPlayerCollisionGround(self, direction):
         collision_direction = {'up': False, 'down': False, 'left': False, 'right': False}
 
         rel_rect = self.player.getRect()
@@ -210,3 +222,10 @@ class System(object):
                         collision_direction['right'] = True
             
         return collision_direction
+
+    def detectPlayerCollisionLadder(self):
+
+        for tile in self.interact_rect:
+            if self.player.getRect().colliderect(tile):
+                return True
+

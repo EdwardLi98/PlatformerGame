@@ -21,3 +21,9 @@ class Map(object):
         temp_surface = pygame.Surface((self.width, self.height))
         self.render(temp_surface)
         return temp_surface
+    
+    def getWidth(self):
+        return self.width
+
+    def getHeight(self):
+        return self.height
